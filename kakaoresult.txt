@@ -1,0 +1,38 @@
+------newtonekkLCkqzCcG9v6qKG
+Content-Type: application/json; charset=UTF-8
+
+{"type":"beginPointDetection","value":"BPD"}
+------newtonekkLCkqzCcG9v6qKG
+Content-Type: application/json; charset=UTF-8
+
+{"type":"partialResult","value":"편"}
+------newtonekkLCkqzCcG9v6qKG
+Content-Type: application/json; charset=UTF-8
+
+{"type":"partialResult","value":"편의점"}
+------newtonekkLCkqzCcG9v6qKG
+Content-Type: application/json; charset=UTF-8
+
+{"type":"partialResult","value":"편의점에서 물"}
+------newtonekkLCkqzCcG9v6qKG
+Content-Type: application/json; charset=UTF-8
+
+{"type":"partialResult","value":"편의점에서 물 1병"}
+------newtonekkLCkqzCcG9v6qKG
+Content-Type: application/json; charset=UTF-8
+
+{"type":"partialResult","value":"편의점에서 물 한 병만"}
+------newtonekkLCkqzCcG9v6qKG
+Content-Type: application/json; charset=UTF-8
+
+{"type":"partialResult","value":"편의점에서 물 한 병원 찾아줘"}
+------newtonekkLCkqzCcG9v6qKG
+Content-Type: application/json; charset=UTF-8
+
+{"type":"endPointDetection","value":"EPD"}
+------newtonekkLCkqzCcG9v6qKG
+Content-Type: application/json; charset=UTF-8
+Speech-Length: 3
+
+{"type":"finalResult","value":"편의점에서 물 한 병만 사다 줘","nBest":[{"value":"편의점에서 물 한 병만 사다 줘","score":20},{"value":"편의점에서 물 한병만 찾아줘","score":0},{"value":"아 편의점에서 물 한 병만 사다 줘","score":0},{"value":"편의점에서 물을 한 병만 사다 줘","score":0}]}
+------newtonekkLCkqzCcG9v6qKG--
