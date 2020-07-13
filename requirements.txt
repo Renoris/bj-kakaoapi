@@ -11,7 +11,7 @@ Flask-Uploads==0.2.1
 Flask-WTF==0.12
 jsonify==0.5
 Pillow==7.2.0
-requests==2.11.1
+requests==2.20.0
 wave==0.0.2
 pytest==5.4.3
 lxml==4.5.2
