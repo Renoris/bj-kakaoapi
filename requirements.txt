@@ -16,3 +16,4 @@ wave==0.0.2
 pytest==5.4.3
 lxml==4.5.2
 pyglet==1.5.7
+pydub==0.24.1
