@@ -1,32 +1,42 @@
 # coding=utf8
-from flask import Flask, request, jsonify ,json
+from flask import Flask, request, jsonify ,json ,send_file
 from PIL import Image
 import requests
 import wave
 from ast import literal_eval
 from lxml import etree
 from pydub import AudioSegment
-import ffmpeg
+import io
 
 app = Flask(__name__)
-
-def write2file(file,content):
-    asd=open(file,'w')
-    asd.write(content)
-    asd.close()
 
 @app.route('/')
 def hello():
     """Return a friendly HTTP greeting."""
     return 'kakaoapi'
 
+def write2file(file,content):
+    asd=open(file,'w')
+    asd.write(content)
+    asd.close()
 
-# @app.route('/kakao', methods=['POST'])
-# def process_image():
-#     file = request.files['image']
-#     # Read the image via file.stream
-#     img = Image.open(file.stream)
-#     return jsonify({'msg': 'success', 'size': [img.width, img.height]})
+def write2voice(filename,content):
+    file = content.read()
+    file2 = open(filename, 'wb')
+    file2.write(file)
+    file2.close()
+
+def write2voicefirst(filename,content): #맨처음 url에서 받아올때 쓰는 메소드
+    file2 = open(filename, 'wb')
+    file2.write(content)
+    file2.close()
+
+@app.route('/kakao', methods=['POST'])
+def process_image():
+    file = request.files['image']
+    # Read the image via file.stream
+    img = Image.open(file.stream)
+    return jsonify({'msg': 'success', 'size': [img.width, img.height]})
 
 
 
@@ -42,7 +52,8 @@ def convertkakaousevoice(file):
 
 
 def gokakaovoice_realvoice(file):
-    myvoice = file.read()
+    myvoice = file
+    #file=file.read()
     api_endpoint = "https://kakaoi-newtone-openapi.kakao.com/v1/recognize"
     api_endpoint = api_endpoint.encode('utf-8')
     content_type = "application/octet-stream"
@@ -98,22 +109,32 @@ def gokakaoxml(voice):
 
 @app.route('/kakao2', methods=['POST'])
 def process_voice2():
-    try :
-        file = request.files['file'].read()
-        file = convertkakaousevoice(file)
-        myvoicestr = gokakaovoice_realvoice(file)
-        response = gokakaoxml(myvoicestr)
-    except :
-        print('error ')
+    # file = request.files['file']
+    #--
+    message = request.files['message']
+    message=message.read()
+    response=requests.get(url=message).content
+    write2voicefirst("middleresult.wav",response)
+    file=io.BufferedReader(open(file='middleresult.wav' , mode='rb'))
+    # #--
+    #---------------------------
+    # write2voice("middleresult.wav",file)
+    # file = io.BufferedReader(open(file='middleresult.wav' , mode='rb'))
+    #-----------------------------------
+    file = convertkakaousevoice(file)
+    #버퍼로 만들어서 읽어야함 아니면 버퍼 객체로 만들거나 근데 객체로 만드는방법이한정적이여서 잘모르겟음
+    myvoicestr = gokakaovoice_realvoice(file)
+    response = gokakaoxml(myvoicestr)
     return response
 
 
 
 @app.route('/kakao3', methods=['POST'])
 def process_voice3():
-    file = request.files['file']
-    myvoicestr=gokakaovoice_realvoice(file)
-    return myvoicestr
+    message = request.files['file']
+    message = message.read()
+    response = requests.get(url=message).content
+    return response
 
 
 if __name__ == '__main__':

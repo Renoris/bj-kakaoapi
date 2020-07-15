@@ -6,6 +6,7 @@ from pydub import AudioSegment
 import ffmpeg
 
 def convertkakaousevoice(file):
+    print(type(file))
     sound = AudioSegment.from_wav(file)
     sound = sound.set_channels(1)
     sound = sound.set_frame_rate(16000)
@@ -19,12 +20,22 @@ def convertkakaousevoice(file):
 # my_img = {'file': open('asd', 'rb')}
 
 
-url = 'http://127.0.0.1:5000/kakao2'
-myfile=open('audio.wav','rb')
-myfile=convertkakaousevoice(myfile)
-my_img = {'file': myfile}
+# url = 'http://127.0.0.1:5000/kakao2'
+# myfile=open('audio.wav','rb')
+# print(type(myfile))
+# # myfile=convertkakaousevoice(myfile)
+# print(type(myfile))
+# my_img = {'file': myfile}
+# r = requests.post(url, files=my_img).content
+# a = open('myvoice.mp3','wb')
+# a.write(r)
+# a.close()
+
+# #------
+url = 'https://evit-project-bj.du.r.appspot.com/kakao3'
+message = "https://s3.amazonaws.com/appforest_uf/f1594707934383x147632581708611600/audio.wav"
+my_img = {'file': message}
 r = requests.post(url, files=my_img).content
 a = open('myvoice.mp3','wb')
 a.write(r)
 a.close()
-
