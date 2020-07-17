@@ -32,10 +32,26 @@ def convertkakaousevoice(file):
 # a.close()
 
 # #------
-url = 'https://evit-project-bj.du.r.appspot.com/kakao3'
-message = "https://s3.amazonaws.com/appforest_uf/f1594707934383x147632581708611600/audio.wav"
-my_img = {'file': message}
-r = requests.post(url, files=my_img).content
-a = open('myvoice.mp3','wb')
+# url = 'http://127.0.0.1:5000/kakao2'
+# message = "https://s3.amazonaws.com/appforest_uf/f1594707934383x147632581708611600/audio.wav"
+# my_img = {'message': message}
+# r = requests.post(url, files=my_img).content
+# a = open('myvoice.mp3','wb')
+# a.write(r)
+# a.close()
+
+# #---get방식
+# eviturl="https://evit-project-bj.du.r.appspot.com/"
+# url = 'https://evit-project-bj.du.r.appspot.com/kakao1?url=https://s3.amazonaws.com/appforest_uf/f1594707934383x147632581708611600/audio.wav'
+# r = requests.get(url).content
+# a = open('myvoice.mp3','wb')
+# a.write(r)
+# a.close()
+
+#---get방식2
+eviturl="https://evit-project-bj.du.r.appspot.com/"
+homeurl='https://evit-project-bj.du.r.appspot.com/kakao7?url=//s3.amazonaws.com/appforest_uf/f1594707934383x147632581708611600/audio.wav'
+r = requests.get(homeurl).content
+a = open('myvoice','wb')
 a.write(r)
 a.close()

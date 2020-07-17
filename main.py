@@ -1,10 +1,6 @@
 # coding=utf8
-from flask import Flask, request, jsonify ,json ,send_file
-from PIL import Image
+from flask import Flask, request, jsonify ,json ,Response ,send_file
 import requests
-import wave
-from ast import literal_eval
-from lxml import etree
 from pydub import AudioSegment
 import io
 
@@ -31,25 +27,12 @@ def write2voicefirst(filename,content): #맨처음 url에서 받아올때 쓰는
     file2.write(content)
     file2.close()
 
-@app.route('/kakao', methods=['POST'])
-def process_image():
-    file = request.files['image']
-    # Read the image via file.stream
-    img = Image.open(file.stream)
-    return jsonify({'msg': 'success', 'size': [img.width, img.height]})
-
-
-
 def convertkakaousevoice(file):
-    try :
-        sound = AudioSegment.from_wav(file)
-        sound = sound.set_channels(1)
-        sound = sound.set_frame_rate(16000)
-        sound = sound.set_sample_width(2)
-    except Exception as e:
-        print("error :" + e )
+    sound = AudioSegment.from_file(file, format="wav")
+    sound = sound.set_channels(1)
+    sound = sound.set_frame_rate(16000)
+    sound = sound.set_sample_width(2)
     return sound.raw_data
-
 
 def gokakaovoice_realvoice(file):
     myvoice = file
@@ -105,7 +88,16 @@ def gokakaoxml(voice):
     response = requests.post(api_endpoint, headers=header, data=xml_data).content
     return response
 
-
+@app.route('/kakao1')
+def process_voice1():
+    message = request.args.get('url')
+    response = requests.get(url=message).content
+    write2voicefirst("middleresult.wav",response)
+    file=io.BufferedReader(open(file='middleresult.wav' , mode='rb'))
+    file = convertkakaousevoice(file)
+    myvoicestr = gokakaovoice_realvoice(file)
+    response = gokakaoxml(myvoicestr)
+    return response
 
 @app.route('/kakao2', methods=['POST'])
 def process_voice2():
@@ -127,8 +119,6 @@ def process_voice2():
     response = gokakaoxml(myvoicestr)
     return response
 
-
-
 @app.route('/kakao3', methods=['POST'])
 def process_voice3():
     message = request.files['file']
@@ -136,7 +126,79 @@ def process_voice3():
     response = requests.get(url=message).content
     return response
 
+@app.route('/kakao4')
+def process_voice4():
+    message = request.args.get('url')
+    response = requests.get(url=message).content
+    return response
+
+@app.route('/kakao5')
+def process_voice5():
+    message = request.args.get('url')
+    response = requests.get(url=message).content
+    response = io.BytesIO(response)
+    response = convertkakaousevoice(response)
+    response = gokakaovoice_realvoice(response)
+    response = gokakaoxml(response)
+    return response
+
+@app.route('/kakao6')
+def process_voice6():
+    message = request.args.get('url')
+    message = "https:"+message
+    try:
+        response = requests.get(url=message).content
+    except:
+        return message
+    try:
+        response = io.BytesIO(response)
+    except:
+        return "io.byte problem"
+    response = convertkakaousevoice(response)
+    try:
+        response = gokakaovoice_realvoice(response)
+    except:
+        return "realvoiceproblem"
+    try:
+        response = gokakaoxml(response)
+    except:
+        return "kakao syn problem"
+    try:
+        response = Response(response=response, mimetype="audio/mpeg")
+    except:
+        return "inner response problem"
+    return response
+
+@app.route('/kakao7')
+def process_voice7():
+    message = request.args.get('url')
+    message = "https:"+message
+    message.encode(encoding="utf-8")
+    try:
+        response = requests.get(url=message).content
+    except:
+        return message
+    try:
+        response = io.BytesIO(response)
+    except:
+        return "io.byte problem"
+    try:
+        response = convertkakaousevoice(response)
+    except:
+        return "conver error"
+    try:
+        response = gokakaovoice_realvoice(response)
+    except:
+        return "realvoiceproblem"
+    try:
+        response = gokakaoxml(response)
+    except:
+        return "kakao syn problem"
+    try:
+        response = Response(response=response, mimetype="audio/mpeg")
+    except:
+        return "inner response problem"
+    return response
 
 if __name__ == '__main__':
     app.run(debug=True)
-
