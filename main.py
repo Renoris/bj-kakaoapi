@@ -3,6 +3,8 @@ from flask import Flask, request, jsonify ,json ,Response ,send_file
 import requests
 from pydub import AudioSegment
 import io
+import time
+
 
 app = Flask(__name__)
 
@@ -10,22 +12,6 @@ app = Flask(__name__)
 def hello():
     """Return a friendly HTTP greeting."""
     return 'kakaoapi'
-
-def write2file(file,content):
-    asd=open(file,'w')
-    asd.write(content)
-    asd.close()
-
-def write2voice(filename,content):
-    file = content.read()
-    file2 = open(filename, 'wb')
-    file2.write(file)
-    file2.close()
-
-def write2voicefirst(filename,content): #맨처음 url에서 받아올때 쓰는 메소드
-    file2 = open(filename, 'wb')
-    file2.write(content)
-    file2.close()
 
 def convertkakaousevoice(file):
     sound = AudioSegment.from_file(file, format="wav")
@@ -41,9 +27,10 @@ def gokakaovoice_realvoice(file):
     api_endpoint = api_endpoint.encode('utf-8')
     content_type = "application/octet-stream"
     autorization_key="KakaoAK dc299f7081d23643fbb5122481b95b48"
-    header = {'Content-Type': content_type,
-              'Authorization': autorization_key,
-              }
+    header = {
+        'Content-Type': content_type,
+        'Authorization': autorization_key,
+    }
     result = requests.post(url=api_endpoint, headers=header, data=myvoice).text
     splitdata=result.splitlines()
     splitdata.reverse()
@@ -53,17 +40,52 @@ def gokakaovoice_realvoice(file):
     myvoicestr = finalresultjsontodict['value']
     return myvoicestr
 
+def MakeKaKaoRCGH(apikey):
+    content_type = "application/octet-stream"
+    header = {
+        'Content-Type': content_type,
+        'Authorization': apikey,
+    }
+    return header
 
-
-def gokakaovoice_txt(file):
-    result = file.read()  # open
-    splitdata = result.splitlines()
+def MakeKaKaoRCGR(url,headers,content):
+    print(url)
+    response = requests.post(url=url, headers=headers, data=content).text
+    splitdata = response.splitlines()
     splitdata.reverse()
-    print(type(splitdata[1]))
-    finalresultjsontodict = json.loads(splitdata[1])
-    myvoicestr = finalresultjsontodict['value']
-    return myvoicestr
+    result = json.loads(splitdata[1])
+    return result['value']
 
+# def gokakaovoice_txt(file):
+#     result = file.read()  # open
+#     splitdata = result.splitlines()
+#     splitdata.reverse()
+#     print(type(splitdata[1]))
+#     finalresultjsontodict = json.loads(splitdata[1])
+#     myvoicestr = finalresultjsontodict['value']
+#     return myvoicestr
+
+def MakeKaKaoSTSH(apikey):
+    content_type = "application/xml"
+    header = {'Content-Type': content_type,
+              'Authorization': apikey,
+    }
+    return header
+
+def MakeKaKaoSTSB(content):
+    text_sppech_front = '요청하신 사항'
+    text_speech = content
+    text_sppech_back = '이 맞습니까?'
+    xml_data = f'<speak>  \
+                        <voice name="WOMAN_DIALOG_BRIGH" >{text_sppech_front}</voice> \
+                        <voice name="WOMAN_DIALOG_BRIGH" >{text_speech}</voice> \
+                        <voice name="WOMAN_DIALOG_BRIGH" >{text_sppech_back}</voice> \
+                    </speak>'
+    xml_data = xml_data.replace('\r', '').encode('utf-8')
+    return xml_data
+
+def MakeKaKaoSTSR(url,header,body):
+    return requests.post(url=url, headers=header, data=body).content
 
 
 def gokakaoxml(voice):
@@ -88,117 +110,36 @@ def gokakaoxml(voice):
     response = requests.post(api_endpoint, headers=header, data=xml_data).content
     return response
 
-@app.route('/kakao1')
-def process_voice1():
-    message = request.args.get('url')
-    response = requests.get(url=message).content
-    write2voicefirst("middleresult.wav",response)
-    file=io.BufferedReader(open(file='middleresult.wav' , mode='rb'))
-    file = convertkakaousevoice(file)
-    myvoicestr = gokakaovoice_realvoice(file)
-    response = gokakaoxml(myvoicestr)
-    return response
-
-@app.route('/kakao2', methods=['POST'])
-def process_voice2():
-    # file = request.files['file']
-    #--
-    message = request.files['message']
-    message=message.read()
-    response=requests.get(url=message).content
-    write2voicefirst("middleresult.wav",response)
-    file=io.BufferedReader(open(file='middleresult.wav' , mode='rb'))
-    # #--
-    #---------------------------
-    # write2voice("middleresult.wav",file)
-    # file = io.BufferedReader(open(file='middleresult.wav' , mode='rb'))
-    #-----------------------------------
-    file = convertkakaousevoice(file)
-    #버퍼로 만들어서 읽어야함 아니면 버퍼 객체로 만들거나 근데 객체로 만드는방법이한정적이여서 잘모르겟음
-    myvoicestr = gokakaovoice_realvoice(file)
-    response = gokakaoxml(myvoicestr)
-    return response
-
-@app.route('/kakao3', methods=['POST'])
-def process_voice3():
-    message = request.files['file']
-    message = message.read()
-    response = requests.get(url=message).content
-    return response
-
-@app.route('/kakao4')
-def process_voice4():
-    message = request.args.get('url')
-    response = requests.get(url=message).content
-    return response
-
-@app.route('/kakao5')
-def process_voice5():
-    message = request.args.get('url')
-    response = requests.get(url=message).content
+@app.route('/kakao8', methods=['POST'])
+def process_voice8():
+    response = request.files['file']
+    response = response.read()
     response = io.BytesIO(response)
     response = convertkakaousevoice(response)
     response = gokakaovoice_realvoice(response)
     response = gokakaoxml(response)
+    response = Response(response=response, mimetype="audio/mpeg")
     return response
 
-@app.route('/kakao6')
-def process_voice6():
-    message = request.args.get('url')
-    message = "https:"+message
-    try:
-        response = requests.get(url=message).content
-    except:
-        return message
-    try:
-        response = io.BytesIO(response)
-    except:
-        return "io.byte problem"
+@app.route('/kakao9', methods=['POST'])
+def process_voice9():
+    KaKaoRCGUrl = "https://kakaoi-newtone-openapi.kakao.com/v1/recognize"
+    KaKaoSTSUrl = "https://kakaoi-newtone-openapi.kakao.com/v1/synthesize"
+    voicefile = request.files['file']
+    KaKaoApikey = request.headers['Authorization']
+    response = voicefile.read()
+    response = io.BytesIO(response)
     response = convertkakaousevoice(response)
-    try:
-        response = gokakaovoice_realvoice(response)
-    except:
-        return "realvoiceproblem"
-    try:
-        response = gokakaoxml(response)
-    except:
-        return "kakao syn problem"
-    try:
-        response = Response(response=response, mimetype="audio/mpeg")
-    except:
-        return "inner response problem"
+    header = MakeKaKaoRCGH(apikey=KaKaoApikey)
+    response = MakeKaKaoRCGR(url=KaKaoRCGUrl, headers=header, content=response)
+    #-- STS 시작
+    header = MakeKaKaoSTSH(apikey=KaKaoApikey)
+    body = MakeKaKaoSTSB(response)
+    response = MakeKaKaoSTSR(url=KaKaoSTSUrl,header=header,body=body)
+    #-- STS 가공
+    response = Response(response=response, mimetype="audio/mpeg")
     return response
 
-@app.route('/kakao7')
-def process_voice7():
-    message = request.args.get('url')
-    message = "https:"+message
-    message.encode(encoding="utf-8")
-    try:
-        response = requests.get(url=message).content
-    except:
-        return message
-    try:
-        response = io.BytesIO(response)
-    except:
-        return "io.byte problem"
-    try:
-        response = convertkakaousevoice(response)
-    except:
-        return "conver error"
-    try:
-        response = gokakaovoice_realvoice(response)
-    except:
-        return "realvoiceproblem"
-    try:
-        response = gokakaoxml(response)
-    except:
-        return "kakao syn problem"
-    try:
-        response = Response(response=response, mimetype="audio/mpeg")
-    except:
-        return "inner response problem"
-    return response
 
 if __name__ == '__main__':
     app.run(debug=True)
