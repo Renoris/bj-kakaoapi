@@ -110,25 +110,16 @@ def gokakaoxml(voice):
     response = requests.post(api_endpoint, headers=header, data=xml_data).content
     return response
 
-@app.route('/kakao8', methods=['POST'])
-def process_voice8():
-    response = request.files['file']
-    response = response.read()
-    response = io.BytesIO(response)
-    response = convertkakaousevoice(response)
-    response = gokakaovoice_realvoice(response)
-    response = gokakaoxml(response)
-    response = Response(response=response, mimetype="audio/mpeg")
-    return response
-
 @app.route('/kakao9', methods=['POST'])
 def process_voice9():
     KaKaoRCGUrl = "https://kakaoi-newtone-openapi.kakao.com/v1/recognize"
     KaKaoSTSUrl = "https://kakaoi-newtone-openapi.kakao.com/v1/synthesize"
     voicefile = request.files['file']
     KaKaoApikey = request.headers['Authorization']
+    # -wav 파일 변환
     response = voicefile.read()
     response = io.BytesIO(response)
+    # -- KaKaoRCG
     response = convertkakaousevoice(response)
     header = MakeKaKaoRCGH(apikey=KaKaoApikey)
     response = MakeKaKaoRCGR(url=KaKaoRCGUrl, headers=header, content=response)
@@ -140,6 +131,30 @@ def process_voice9():
     response = Response(response=response, mimetype="audio/mpeg")
     return response
 
+
+@app.route('/kakaoRCG', methods=['POST'])
+def process_voiceRCG():
+    KaKaoRCGUrl = "https://kakaoi-newtone-openapi.kakao.com/v1/recognize"
+    voicefile = request.files['file']
+    KaKaoApikey = request.headers['Authorization']
+    response = voicefile.read()
+    response = io.BytesIO(response)
+    # -- KaKaoRCG
+    response = convertkakaousevoice(response)
+    header = MakeKaKaoRCGH(apikey=KaKaoApikey)
+    response = MakeKaKaoRCGR(url=KaKaoRCGUrl, headers=header, content=response)
+    return response
+
+@app.route('/kakaoSTS')
+def process_voiceSTS():
+    KaKaoSTSUrl = "https://kakaoi-newtone-openapi.kakao.com/v1/synthesize"
+    RCGVoice = request.args.get('say')
+    KaKaoApikey = request.headers['Authorization']
+    header = MakeKaKaoSTSH(apikey=KaKaoApikey)
+    body = MakeKaKaoSTSB(RCGVoice)
+    response = MakeKaKaoSTSR(url=KaKaoSTSUrl, header=header, body=body)
+    response = Response(response=response, mimetype="audio/mpeg")
+    return response
 
 if __name__ == '__main__':
     app.run(debug=True)
