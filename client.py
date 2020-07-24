@@ -91,7 +91,7 @@ timestamp = datetime.datetime.now().timestamp()
 # print(r)
 
 #https://evit-project-bj.du.r.appspot.com/PSA
-jsoncall-array
+
 def test_adamsapi(url, params):
     response = requests.get(url=url,params=params).content
     response = json.loads(response)
