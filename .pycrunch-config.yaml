@@ -1,0 +1,7 @@
+discovery:
+  exclusions:
+  - ignored_folder/
+  - test_ignored.py
+engine:
+  runtime: pytest
+pinned-tests: []
