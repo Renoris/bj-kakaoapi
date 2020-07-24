@@ -9,25 +9,25 @@ def getlocation(data):
 def knownmany(data):
     word=data['lemma']
     if word=="하나" or word == "한" or word == "1":
-        return 1
+        return "1"
     elif word=="둘" or word == "두" or word=="2":
-        return 2
+        return "2"
     elif word == "셋" or word == "세" or word=="3":
-        return 3
+        return "3"
     elif word == "넷" or word == "네" or word=="4":
-        return 4
+        return "4"
     elif word == "다섯" or word == "5":
-        return 5
+        return "5"
     elif word == "여섯" or word == "6":
-        return 6
+        return "6"
     elif word == "일곱" or word == "7":
-        return 7
+        return "7"
     elif word == "여덟" or word == "8":
-        return 8
+        return "8"
     elif word == "아홉" or word== "9":
-        return 9
+        return "9"
     elif word == "열" or word=="10":
-        return 10
+        return "10"
 
 def getNNGNNP(data):
     NRfind=False
@@ -81,7 +81,7 @@ def getNNGNNPArray(data):
                 number = knownmany(val)
                 NRfind = False
                 NNPNNGlist.update([("제품",product)])
-                NNPNNGlist.update([("수량",number)])
+                NNPNNGlist.update([("수량",number+"개")])
                 print(number)
                 product = ""
                 number = 0
@@ -97,7 +97,17 @@ def getNNGNNPArray(data):
             #     arraylist.append(NNPNNGlist)
             #     NNPNNGlist={}
     return arraylist
-
+def usesay(makedict):
+    data = makedict
+    saystring = ""
+    location = data['location']
+    productlist = data['product']
+    saystring += location+"에서 "
+    for i in productlist:
+        saystring += i['제품']+" "
+        saystring += i["수량"]+" "
+    saystring += "구입"
+    return saystring
 
 def getpsdata(jsonfile):
     data=json.loads(jsonfile)
@@ -122,6 +132,8 @@ def getpsdataArray(jsonfile):
     result={}
     result.update([("location", location)])
     result.update([("product", productlist)])
+    saystring=usesay(result)
+    result.update([("say",saystring)])
     result=json.dumps(result, ensure_ascii=False)
     return result
 
@@ -134,3 +146,4 @@ def getdataadams(myvoicestrng):
         "lang": "kor"
     }
     return requests.get(url=url, params=params).content
+

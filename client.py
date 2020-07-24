@@ -107,7 +107,7 @@ def test_adamsapi(url, params):
 #     "analysis" : "ne",
 #     "lang":"kor"
 # }
-url2="http://127.0.0.1:5000/PS"
+url2="http://127.0.0.1:5000/PSA"
 params={
     "say":"이마트에서 물 두 개 음류수 세 개 과자 열 개 사다줘",
 }
