@@ -1,10 +1,13 @@
 import json
 import requests
+
 def getlocation(data):
     for idx, val in enumerate(data):
-        if val["lemma"]=="에서":
-            locationjson=data.pop(idx-1) # data에서 이마트는 빠져나감
+        if val["lemma"] == "에서":
+            locationjson=data.pop(idx-1) #data에서 이마트는 빠져나감
             return locationjson["lemma"]
+    return "편의점"
+
 
 def knownmany(data):
     word=data['lemma']
@@ -31,38 +34,26 @@ def knownmany(data):
 
 def getNNGNNP(data):
     NRfind=False
-    # arraylist=[]
-    NNPNNGlist={}
-    product=""
-    number=0
+    NNPNNGlist = {}
+    product = ""
+    number = 0
     for idx, val in enumerate(data):
         if NRfind==False:
             if val["type"] == "NNG" or val["type"] == "NNP":
-                product = val ["lemma"]
+                product = val["lemma"]
                 NRfind = True
                 print(product)
         else:
-            if val["type"] == "MM" or val["type"] == "NR" or val["type"]=="SN":
+            if val["type"] == "MM" or val["type"] == "NR" or val["type"] == "SN":
                 number = knownmany(val)
                 NRfind = False
-                NNPNNGlist.update([("제품",product)])
-                NNPNNGlist.update([("수량",number)])
+                NNPNNGlist.update([("제품", product)])
+                NNPNNGlist.update([("수량", number)])
                 print(number)
                 product = ""
                 number = 0
                 print(NNPNNGlist)
                 return NNPNNGlist
-                # arraylist.append(NNPNNGlist)
-                # NNPNNGlist={}
-            # else:
-            #     number = 1
-            #     NNPNNGlist.update([("제품", product)])
-            #     NNPNNGlist.update([("수량", number)])
-            #     product = ""
-            #     number = 0
-            #     arraylist.append(NNPNNGlist)
-            #     NNPNNGlist={}
-    # return arraylist
 
 def getNNGNNPArray(data):
     NRfind=False
@@ -73,30 +64,113 @@ def getNNGNNPArray(data):
     for idx, val in enumerate(data):
         if NRfind==False:
             if val["type"] == "NNG" or val["type"] == "NNP":
-                product = val ["lemma"]
+                product = val["lemma"]
                 NRfind = True
-                print(product)
         else:
-            if val["type"] == "MM" or val["type"] == "NR" or val["type"]=="SN":
+            if val["type"] == "MM" or val["type"] == "NR" or val["type"] == "SN":
                 number = knownmany(val)
                 NRfind = False
                 NNPNNGlist.update([("제품",product)])
                 NNPNNGlist.update([("수량",number+"개")])
-                print(number)
                 product = ""
                 number = 0
                 print(NNPNNGlist)
                 arraylist.append(NNPNNGlist)
                 NNPNNGlist={}
-            # else:
-            #     number = 1
-            #     NNPNNGlist.update([("제품", product)])
-            #     NNPNNGlist.update([("수량", number)])
-            #     product = ""
-            #     number = 0
-            #     arraylist.append(NNPNNGlist)
-            #     NNPNNGlist={}
+
+            elif val["type"] == "NNG" or val["type"] == "NNP":
+                number = "1"
+                NRfind = False
+                NNPNNGlist.update([("제품", product)])
+                NNPNNGlist.update([("수량", number + "개")])
+                print(number)
+                product = ""
+                number = 0
+                print(NNPNNGlist)
+                arraylist.append(NNPNNGlist)
+                NNPNNGlist = {}
     return arraylist
+#
+# def testgetNNGNNPArray(data):
+#     NRfind = False
+#     arraylist = []
+#     NNPNNGlist = {}
+#     product = ""
+#     number = 1
+#     for idx, val in enumerate(data):
+#         if NRfind == False:
+#             if val["type"] == "NNG" or val["type"] == "NNP":
+#                 NRfind = True
+#                 product = val["lemma"]
+#                 number = "1"
+#                 NNPNNGlist.update([("제품", product)])
+#                 NNPNNGlist.update([("수량", number + "개")])
+#                 arraylist.append(NNPNNGlist)
+#                 NNPNNGlist={}
+#         else:
+#             if val["type"] == "MM" or val["type"] == "NR" or val["type"] == "SN":
+#                 NRfind = False
+#                 NNPNNGlist=arraylist[-1]
+#                 number = knownmany(val)
+#                 NNPNNGlist.update([("수량", number + "개")])
+#                 arraylist.remove(arraylist[-1])
+#                 arraylist.append(NNPNNGlist)
+#                 product = ""
+#                 NNPNNGlist = {}
+#             elif val["type"] == "NNG" or val["type"] == "NNP":
+#                 NRfind = False
+#                 product = val['lemma']
+#                 number = "1"
+#                 NNPNNGlist.update([("제품", product)])
+#                 NNPNNGlist.update([("수량", number + "개")])
+#                 arraylist.append(NNPNNGlist)
+#                 NNPNNGlist = {}
+#     return arraylist
+
+# def testgetNNGNNPArrayelrang(data):
+#     NRfind=False
+#     arraylist=[]
+#     NNPNNGlist={}
+#     product=""
+#     number=0
+#     chainmmgp=False
+#     for idx, val in enumerate(data):
+#         if NRfind==False:
+#             if val["type"] == "NNG" or val["type"] == "NNP":
+#                 if chainmmgp == True:
+#                     chainmmgp=False
+#                     continue
+#                 product = val["lemma"]
+#                 number = "1"
+#                 NNPNNGlist.update([("제품", product)])
+#                 NNPNNGlist.update([("수량", number)])
+#                 arraylist.append(NNPNNGlist)
+#                 NRfind = True
+#                 chainmmgp==True
+#         else:
+#             if val["type"] == "NNG" or val["type"] == "NNP":
+#                 if chainmmgp==True:
+#                     chainmmgp=False
+#                     continue
+#                 product = val["lemma"]
+#                 number = "1"
+#                 NNPNNGlist.update([("제품", product)])
+#                 NNPNNGlist.update([("수량", number)])
+#                 arraylist.append(NNPNNGlist)
+#                 NNPNNGlist = {}
+#                 chainmmgp = True
+#             else:
+#                 chainmmgp = False
+#                 if val["type"] == "MM" or val["type"] == "NR" or val["type"] == "SN":
+#                     number = knownmany(val)
+#                     NNPNNGlist = arraylist[-1]
+#                     arraylist.remove(arraylist[-1])
+#                     NNPNNGlist.update([("수량", number)])
+#                     arraylist.append(NNPNNGlist)
+#                     NNPNNGlist = {}
+#                     NRfind = False
+#     return arraylist
+
 def usesay(makedict):
     data = makedict
     saystring = ""
@@ -132,6 +206,22 @@ def getpsdataArray(jsonfile):
     result={}
     result.update([("location", location)])
     result.update([("product", productlist)])
+    saystring=usesay(result)
+    result.update([("say",saystring)])
+    result=json.dumps(result, ensure_ascii=False)
+    return result
+
+def testgetpsdataArray(jsonfile):
+    data=json.loads(jsonfile)
+    data = data["return_object"]["sentence"]
+    data = data[0]
+    data = data["morp"]
+    location = getlocation(data)
+    productlist=testgetNNGNNPArray(data)
+    result={}
+    result.update([("location", location)])
+    result.update([("product", productlist)])
+    print(result)
     saystring=usesay(result)
     result.update([("say",saystring)])
     result=json.dumps(result, ensure_ascii=False)

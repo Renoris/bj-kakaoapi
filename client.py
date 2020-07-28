@@ -4,11 +4,9 @@ import json
 import uu
 import wave
 from pydub import AudioSegment
-import time, datetime
 import koalanlp
 import urllib3
 import json
-
 
 def convertkakaousevoice(file):
     sound = AudioSegment.from_wav(file)
@@ -16,9 +14,6 @@ def convertkakaousevoice(file):
     sound = sound.set_frame_rate(16000)
     sound = sound.set_sample_width(2)
     return sound.raw_data
-
-
-timestamp = datetime.datetime.now().timestamp()
 
 # def convertkakaousevoice2(file):
 #     sound = AudioSegment.from_wav(file)
@@ -28,8 +23,8 @@ timestamp = datetime.datetime.now().timestamp()
 #     sound.export('middleresult',format="wav")
 
 # url1='http://127.0.0.1:5000/kakaoRCG'
-# url2 = 'http://127.0.0.1:5000/kakaoSTS'
-# file=open('audio.wav','rb')
+# # url2 = 'http://127.0.0.1:5000/kakaoSTS'
+# file=open('audio2.wav','rb')
 # file = {
 #     'file' : file
 # }
@@ -45,7 +40,7 @@ timestamp = datetime.datetime.now().timestamp()
 #
 # print(type(response))
 #
-# asd=open('result.wav','wb')
+# asd=open('result2.txt','w')
 # asd.write(response)
 # asd.close()
 
@@ -92,24 +87,43 @@ timestamp = datetime.datetime.now().timestamp()
 
 #https://evit-project-bj.du.r.appspot.com/PSA
 
-def test_adamsapi(url, params):
-    response = requests.get(url=url,params=params).content
-    response = json.loads(response)
-    response = json.dumps(response, ensure_ascii=False, indent=4)
-    asd=open("adamsapiresult9.json",'w')
-    asd.write(response)
-    return response
-# #
+# def test_adamsapi(url, params):
+#     response = requests.get(url=url,params=params).content
+#     response = json.loads(response)
+#     response = json.dumps(response, ensure_ascii=False, indent=4)
+#     asd=open("adamsapiresult6.json",'w')
+#     asd.write(response)
+#     return response
+# # # 감자를 감(VV) 자(EC)로 때어버림
+# # 새우를 동사로 받음
+# # result1="물이랑 음료수랑 과자랑 피자랑 치토스 사가 줘요"
+# result2="감자 다섯개 새우 여섯개 지갑 세개 물 여덟개 식사권 다섯개 사다줘"
 # url2="http://api.adams.ai/datamixiApi/tms"
 # params={
 #     "key":"7493803880294659905",
-#     "query" : "이마트에서 물 두 개 음류수 세 개 과자 열 개",
+#     "query" : result2,
 #     "analysis" : "ne",
 #     "lang":"kor"
 # }
-url2="http://127.0.0.1:5000/PSA"
-params={
-    "say":"이마트에서 물 두 개 음류수 세 개 과자 열 개 사다줘",
-}
+# url2="http://127.0.0.1:5000/PSA"
+# params={
+#     "say":result2,
+# }
 
-response=test_adamsapi(url=url2,params=params)
+# response=test_adamsapi(url=url2,params=params)
+
+def findroute():
+    url="https://apis.openapi.sk.com/tmap/routes"
+
+
+def findname(searchkeyword, centerLon, centerLat):
+    url="http://127.0.0.1:5000/tmapfind"
+    params={
+        'searchKeyword' : searchkeyword,
+        'centerLon' : centerLon,
+        'centerLat' : centerLat,
+    }
+    response=requests.get(url=url,params=params).text
+    return response
+
+print(findname("편의점",'126.571664','33.442260'))
